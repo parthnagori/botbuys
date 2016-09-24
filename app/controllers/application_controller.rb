@@ -45,12 +45,12 @@ class ApplicationController < ActionController::Base
       if user.otp.to_s == received_message.to_s
         message = "Verified!\n"
         message = message + Bot.command_msg
-        user.content["verified"] = true
-        user.save
-        if euser = User.find_by(email: user.email)
+        if euser = User.verified.find_by(email: user.email)
           user.parent_id = euser.id
           user.save
         end
+        user.content["verified"] = true
+        user.save
       else
         message = "Wrong otp"
         puts "wrong OTP"
@@ -74,6 +74,8 @@ class ApplicationController < ActionController::Base
     received_message = messageobj["text"]
     if user.blank?
       user = User.create_from_channel(channel_name, channel_id)
+      user.name = Bot.get_name(senderobj)
+      user.save
     end
     command = received_message.split(" ")[0]
     value = received_message.split(" ")[1..-1]
@@ -96,7 +98,7 @@ class ApplicationController < ActionController::Base
       if Bot::COMMANDS.keys.include?(command)
         message = Bot.response(command, value)
       else
-        message = Bot.command_msg
+        message = "Hey #{Bot.get_name(senderobj)}\n" + Bot.command_msg
       end
     end
 

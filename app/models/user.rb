@@ -9,6 +9,15 @@ class User < ActiveRecord::Base
 
   after_initialize :init
   scope :get_user, -> (channeltype, channelid) {where("(content ->> 'channelid') = '#{channelid}'").where("(content ->> 'channeltype') = '#{channeltype}'")}
+  scope :verified, ->{ where("(content ->> 'verified') = 'true'") }
+
+  def parent
+    if parent_id
+      return User.find parent_id
+    else
+      return self
+    end
+  end
 
   def init
     self.content ||= {}
@@ -94,7 +103,11 @@ class User < ActiveRecord::Base
     return user
   end
 
-  store_accessor :content, :phone_pending, :phone, :otp, :received_phone
+  store_accessor :content, :phone_pending, :phone, :otp, :received_phone, :name
+
+  def first_name
+    name.split(" ")[0] rescue ""
+  end
 
   def self.save_from_google_user(credentials)
     authservice = Google::Apis::Oauth2V2::Oauth2Service.new

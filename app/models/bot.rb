@@ -25,10 +25,23 @@ class Bot
     return message
   end
 
+  def self.more_command_msg
+    message = "More commands\n"
+    Bot::MORE_COMMANDS.each do |k,v|
+      message = "#{message}#{k} - #{v}\n"
+    end
+    return message
+  end
+
   def self.response(command, value)
     # Bot.response(command, value)
+    case command
+    when "more"
+      return Bot.more_command_msg
+    end
     return "your command is #{command}, value is #{value}"
   end
 
-  COMMANDS = {"+account" => "Add new Accout", "accounts" => "Details of all your Accouts", "surprize-me" => "Get amazed by Botbuys"}
+  MORE_COMMANDS = {"email" => "My email address"}
+  COMMANDS = {"+account" => "Add new Accout", "accounts" => "Details of all your Accouts", "surprize-me" => "Get amazed by Botbuys", "more" => "Get more options"}
 end
