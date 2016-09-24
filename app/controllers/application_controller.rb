@@ -39,6 +39,7 @@ class ApplicationController < ActionController::Base
       user.phone = received_message
       otp = SecureRandom.random_number(8999) + 1000
       user.otp = otp
+      Sms.send_otp(otp, user.phone)
       puts "user otp: #{otp}"
       user.save
     else
@@ -87,7 +88,6 @@ class ApplicationController < ActionController::Base
           user.save
         else
           message = otp_mode(user,received_message)
-          # send sms
         end
       else
         message = otp_mode(user,received_message)
