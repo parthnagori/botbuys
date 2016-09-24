@@ -1,6 +1,7 @@
 # config/settings.yml
 defaults: &defaults
-  barclay_base_url: <%= ENV["BARCLAY_BASE_URL"] %>
+  barclay_customer_url: <%= ENV["BARCLAY_CUSTOMER_URL"] %>
+  barclay_account_url: <%= ENV["BARCLAY_ACCOUNT_URL"] %>
   cool:
     saweet: nested settings
   neat_setting: 24
