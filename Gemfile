@@ -12,6 +12,7 @@ gem 'settingslogic'
 gem 'responders'
 gem 'dotenv-rails', :groups => [:development, :test]
 gem 'delayed_job_active_record'
+gem 'twilio-ruby'
 
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
