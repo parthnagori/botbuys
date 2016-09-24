@@ -15,6 +15,8 @@ gem 'delayed_job_active_record'
 
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
+gem 'google_drive', git: 'https://github.com/gimite/google-drive-ruby.git', branch: "master"
+gem 'goodreads'
 gem 'devise'
 gem 'rails_12factor'
 gem 'rest-client', '>= 1.7.3'
