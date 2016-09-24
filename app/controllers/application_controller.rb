@@ -35,6 +35,7 @@ class ApplicationController < ActionController::Base
 
   def incoming_bot
     RestClient.post("https://api.telegram.org/bot287297665:AAGf5sJQeRa_l8-JGre-GkwTtaXV-3IDGH4/sendMessage", {"chat_id": 230551077, "text": "#{params.to_s}"})
+    head 200
   end
 
   def oauth_callback_goodreads
