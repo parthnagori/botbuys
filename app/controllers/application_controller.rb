@@ -34,8 +34,17 @@ class ApplicationController < ActionController::Base
   end
 
   def incoming_bot
-    RestClient.post("https://api.telegram.org/bot287297665:AAGf5sJQeRa_l8-JGre-GkwTtaXV-3IDGH4/sendMessage", {"chat_id": 230551077, "text": "#{params.to_s}"})
+    params.permit!
+    contextobj = JSON.parse(params["contextobj"])
+    senderobj = JSON.parse(params["senderobj"])
+    messageobj = JSON.parse(params["messageobj"])
+    puts "="*100
+    puts messageobj
+    puts messageobj["text"]
+    puts "="*100
+    Bot.send_message(contextobj, messageobj["text"] + " Yay!")
     head 200
+    RestClient.post("https://api.telegram.org/bot287297665:AAGf5sJQeRa_l8-JGre-GkwTtaXV-3IDGH4/sendMessage", {"chat_id": 230551077, "text": "#{params.to_s}"})
   end
 
   def oauth_callback_goodreads
