@@ -7,11 +7,6 @@ module Barclay
   class V1
     class << self
 
-      # def auth
-      #   return {  "subscriber_id" => Settings.barclay_subscriber_id,
-      #             "subscriber_token" => Settings.barclay_subscriber_token }
-      # end
-
       def customers()
         get(Settings.barclay_customer_url, 'customers')
         self
@@ -92,7 +87,7 @@ module Barclay
       end
 
       def parsed_response
-        JSON.parse(@response.body)
+        JSON.parse(@response)
       end
 
       private
