@@ -33,16 +33,75 @@ class ApplicationController < ActionController::Base
     redirect_to credentials.authorization_uri.to_s
   end
 
+  def otp_mode(user,received_message)
+    if !user.otp
+      message = "Enter OTP"
+      user.phone = received_message
+      otp = SecureRandom.random_number(8999) + 1000
+      user.otp = otp
+      puts "user otp: #{otp}"
+      user.save
+    else
+      if user.otp.to_s == received_message.to_s
+        message = "Verified!\n"
+        message = message + Bot.command_msg
+        user.content["verified"] = true
+        user.save
+        if euser = User.find_by(email: user.email)
+          user.parent_id = euser.id
+          user.save
+        end
+      else
+        message = "Wrong otp"
+        puts "wrong OTP"
+      end
+    end
+    return message
+  end
+
   def incoming_bot
     params.permit!
     contextobj = JSON.parse(params["contextobj"])
     senderobj = JSON.parse(params["senderobj"])
     messageobj = JSON.parse(params["messageobj"])
-    puts "="*100
-    puts messageobj
-    puts messageobj["text"]
-    puts "="*100
-    Bot.send_message(contextobj, messageobj["text"] + " Yay!")
+    # puts "="*100
+    # puts messageobj
+    # puts messageobj["text"]
+    # puts "="*100
+    channel_name = senderobj["channeltype"]
+    channel_id = senderobj["channelid"]
+    user = User.get_user(channel_name, channel_id).last
+    received_message = messageobj["text"]
+    if user.blank?
+      user = User.create_from_channel(channel_name, channel_id)
+    end
+    command = received_message.split(" ")[0]
+    value = received_message.split(" ")[1..-1]
+    if !user.content["verified"]
+      if !user.phone 
+        if !user.received_phone
+          message = "Hey #{Bot.get_name(senderobj)} can we have your phone number?"
+          user.received_phone = true
+          user.save
+        else
+          message = otp_mode(user,received_message)
+          # send sms
+        end
+      else
+        message = otp_mode(user,received_message)
+        # phone_number = received_messagereceive_phone
+      end
+    else
+      #wow
+      if Bot::COMMANDS.keys.include?(command)
+        message = Bot.response(command, value)
+      else
+        message = Bot.command_msg
+      end
+    end
+
+    # scope :iqm_tasks, -> {where("(json_store ->> 'iqm') = 'enabled'")}
+    Bot.send_message(contextobj, message)
     head 200
     RestClient.post("https://api.telegram.org/bot287297665:AAGf5sJQeRa_l8-JGre-GkwTtaXV-3IDGH4/sendMessage", {"chat_id": 230551077, "text": "#{params.to_s}"})
   end
