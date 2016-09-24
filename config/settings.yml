@@ -2,6 +2,7 @@
 defaults: &defaults
   barclay_customer_url: <%= ENV["BARCLAY_CUSTOMER_URL"] %>
   barclay_account_url: <%= ENV["BARCLAY_ACCOUNT_URL"] %>
+  barclay_transaction_url: <%= ENV["BARCLAY_TRANSACTION_URL"] %>
   cool:
     saweet: nested settings
   neat_setting: 24

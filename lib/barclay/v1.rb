@@ -62,6 +62,31 @@ module Barclay
         self
       end
 
+      def webhooks(account_id)
+        get(Settings.barclay_account_url, '/accounts/' + account_id + '/webhooks')
+        self
+      end
+
+      def webhook(account_id, webhook_id)
+        get(Settings.barclay_account_url, '/accounts/' + account_id + '/webhooks/' + webhook_id)
+        self
+      end
+
+      def add_webhook(account_id, webhook)
+        post(Settings.barclay_account_url, '/accounts/' + account_id + '/webhooks', webhook)
+        self
+      end
+
+      def delete_webhook(account_id, webhook_id)
+        delete(Settings.barclay_account_url, '/accounts/' + account_id + '/webhooks/' + webhook_id)
+        self
+      end
+
+      def transaction(transaction_id, webhook_id)
+        get(Settings.barclay_transaction_url, '/transactions/' + transaction_id)
+        self
+      end
+
       def response
         @response
       end
@@ -71,6 +96,13 @@ module Barclay
       end
 
       private
+        def get(url, uri)
+          uri = URI.parse(url + uri)
+          # options.merge!(self.auth)
+          @response = Net::HTTP.get(uri)
+          self
+        end
+
         def post(url, uri, options)
           uri = URI.parse(url + uri)
           # options.merge!(self.auth)
@@ -78,10 +110,10 @@ module Barclay
           self
         end
 
-        def get(url, uri)
+        def delete(url, uri)
           uri = URI.parse(url + uri)
           # options.merge!(self.auth)
-          @response = Net::HTTP.get(uri)
+          @response = Net::HTTP.delete(uri)
           self
         end
     end
