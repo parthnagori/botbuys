@@ -33,15 +33,19 @@ class Bot
     return message
   end
 
-  def self.response(command, value)
+  def self.response(command, value, user)
     # Bot.response(command, value)
     case command
     when "more"
       return Bot.more_command_msg
+    when "email"
+      return "Your botbuys email address is #{user.email}"
+    when "phone"
+      return "Your botbuys phone no. is #{user.phone}"
     end
-    return "your command is #{command}, value is #{value}"
+    return "Hey #{user.first_name}\n" + Bot.command_msg
   end
 
-  MORE_COMMANDS = {"email" => "My email address"}
+  MORE_COMMANDS = {"phone" => "My phone number"}
   COMMANDS = {"+account" => "Add new Accout", "accounts" => "Details of all your Accouts", "surprize-me" => "Get amazed by Botbuys", "more" => "Get more options"}
 end
