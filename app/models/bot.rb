@@ -35,10 +35,13 @@ class Bot
 
   def self.response(command, value, user)
     # Bot.response(command, value)
+    command = command.downcase
     case command
     when "/more"
+    when "more"
       return Bot.more_command_msg
     when "/transactions"
+    when "transactions"
       result = ""
       hash = AnalyzeAccount.get_transaction_summary_for_customer("")
       hash.each do |acc_no, monthly_data|
@@ -52,6 +55,7 @@ class Bot
       end
       return result
     when "/expenditure"
+    when "expenditure"
       result = ""
       hash = AnalyzeAccount.get_max_spends("")
       hash.each do |acc_no, data|
@@ -65,6 +69,7 @@ class Bot
       end
       return result
     when "/balance"
+    when "balance"
       result = ""
       hash = AnalyzeAccount.get_account_balances("")
       hash.each do |acc_no, amt|
@@ -72,6 +77,7 @@ class Bot
       end
       return result
     when "/account_types"
+    when "account_types"
       result = ""
       hash = AnalyzeAccount.get_account_types("")
       hash.each do |k,v|
@@ -79,18 +85,36 @@ class Bot
       end
       return result
     when "/email"
+    when "email"
       return "Your botbuys email address is #{user.email}"
     when "/phone"
+    when "phone"
       return "Your botbuys phone no. is #{user.phone}"
     when "buy"
       return "Buying #{user.products[value[0].to_i]}"
     when "/inv_opts"
+    when "inv_opts"
       result = ""
       AnalyzeAccount::INVESTMENT_OPTIONS.each do |k,v|
         result = "#{result}#{k}:  #{v["institute_name"]} Offering #{v["rate"]}, Tenure: #{v["min_tenure_months"]} month, Risk factor: #{v["risk"]}\n"
       end
       return result
+    when "/loans"
+    when "loans"
+      result = ""
+      Loans::LENDERS.each_with_index do |hash, index|
+        result = "#{result}#{index}. #{hash["institute_name"]}, Rate: #{hash["rate"]}, Tenure: #{hash["tenure"]}\n"
+      end
+      result = "#{result} Get detailed information by command loan followed by id and then amount. For Example:\n loan ID AMOUNT"
+      return result
+    when "/loan"
+    when "loan"
+      result = ""
+      hash = Loans.apply_loans(value[0], value[1].to_s.to_i)
+      result = "EMI: #{hash["emi"]}, Repayment: #{hash["repayment"]}, Tenure: #{hash["tenure"]} months, Interest: #{hash["interest"]}"
+      return result
     when "/pay"
+    when "pay"
       if value.count == 0
         result = "Get your payments done via this command. For Example:\n pay payee_id amount\n"
         a = Payments.get_payees("")
@@ -162,8 +186,8 @@ class Bot
     return "Reply with buy 1,2 or 3 to buy respective product"
   end
 
-  MORE_COMMANDS = {"/phone" => "My phone number", "buy" => "Search online for products you wanna buy"}
-  COMMANDS = {"/accounts" => "Details of all your Accouts","/transactions" => "Get details of all your transactions", "/expenditure" => "Get details of ", "/balance" => "Get balance of your accouts","/account_types" => "Get account types", "/more" => "Get more options", "/pay" => "Get your payments done via this command. For Example:\n pay payee_id amount", "/inv_opts" => "Show me Investment options"}
+  MORE_COMMANDS = {"/phone" => "My phone number"}
+  COMMANDS = {"/accounts" => "Details of all your Accouts","/transactions" => "Get details of all your transactions", "/expenditure" => "Get details of ", "/balance" => "Get balance of your accouts","/account_types" => "Get account types", "/more" => "Get more options", "/pay" => "Get your payments done via this command. For Example:\n pay payee_id amount", "/inv_opts" => "Show me Investment options", "/loans" => "Get loan providers info"}
   # get_transaction_summary_for_customer(phone_no)
   # get_max_spends(phone_no)
   # get_account_balances(phone_no)
