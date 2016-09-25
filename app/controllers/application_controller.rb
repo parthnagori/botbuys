@@ -35,7 +35,7 @@ class ApplicationController < ActionController::Base
 
   def otp_mode(user,received_message)
     if !user.otp
-      if !received_message.scan(/\d{10}/).blank?
+      if !received_message.scan(/\d{10}/).blank? || user.otp
         message = "Enter OTP"
         user.phone = received_message
         otp = SecureRandom.random_number(8999) + 1000
@@ -59,8 +59,8 @@ class ApplicationController < ActionController::Base
       else
         message = "Wrong otp"
         puts "wrong OTP"
-        user.otp = nil
-        user.save
+        # user.otp = nil
+        # user.save
       end
     end
     return message

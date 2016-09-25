@@ -38,6 +38,46 @@ class Bot
     case command
     when "more"
       return Bot.more_command_msg
+    when "transactions"
+      result = ""
+      hash = AnalyzeAccount.get_transaction_summary_for_customer("")
+      hash.each do |acc_no, monthly_data|
+        result = "#{result}#{acc_no}\n"
+        monthly_data.each do |month, data|
+          result = "#{result}  #{month}\n"
+          data.each do |dir, amt|
+            result = "#{result}    #{dir}: #{amt}\n"
+          end
+        end
+      end
+      return result
+    when "expenditure"
+      result = ""
+      hash = AnalyzeAccount.get_max_spends("")
+      hash.each do |acc_no, data|
+        result = "#{result}#{acc_no}\n"
+        total = 0
+        data.each do |where, amt|
+          result = "#{result}  #{where}: #{amt}\n"
+          total = total + amt.to_f
+        end
+        result = "#{result}  Total:#{total}\n"
+      end
+      return result
+    when "balance"
+      result = ""
+      hash = AnalyzeAccount.get_account_balances("")
+      hash.each do |acc_no, amt|
+        result = "#{result}#{acc_no}: #{amt}\n"
+      end
+      return result
+    when "account-types"
+      result = ""
+      hash = AnalyzeAccount.get_account_types("")
+      hash.each do |k,v|
+        result = "#{result}#{k}:#{v}\n"
+      end
+      return result
     when "email"
       return "Your botbuys email address is #{user.email}"
     when "phone"
@@ -91,5 +131,10 @@ class Bot
   end
 
   MORE_COMMANDS = {"phone" => "My phone number", "buy" => "Search online for products you wanna buy"}
-  COMMANDS = {"+account" => "Add new Accout", "accounts" => "Details of all your Accouts", "surprize-me" => "Get amazed by Botbuys", "more" => "Get more options"}
+  COMMANDS = {"accounts" => "Details of all your Accouts","transactions" => "Get details of all your transactions", "expenditure" => "Get details of ",  "surprize-me" => "Get amazed by Botbuys", "balance" => "Get balance of your accouts","account-types" => "Get account types", "more" => "Get more options"}
+  # get_transaction_summary_for_customer(phone_no)
+  # get_max_spends(phone_no)
+  # get_account_balances(phone_no)
+  # get_account_types(phone_no)
+
 end

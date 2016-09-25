@@ -79,7 +79,8 @@ class AnalyzeAccount
   def self.get_customer_info(phone_no)
     response = Barclay::V1.customers
     customers = response.parsed_response
-    customer_info = customers.select {|customer| customer["mobileNo"] == phone_no}.last rescue nil
+    # customer_info = customers.select {|customer| customer["mobileNo"] == phone_no}.last rescue nil
+    customer_info = customers.select {|customer| true}.last rescue nil
   end
 
   def self.get_all_transactions(account_ids)
