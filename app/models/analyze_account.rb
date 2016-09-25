@@ -1,15 +1,10 @@
 class AnalyzeAccount
-  INVESTMENT_OPTIONS = {
-    "Investment_1"=>{"rate"=>"5", "min_tenure_months"=>"12", "institute_name"=>"ABC Bank", "risk"=>"1"},
-    "Investment_2"=>{"rate"=>"10", "min_tenure_months"=>"6", "institute_name"=>"ABC Bank", "risk"=>"2"}
-    "Investment_3"=>{"rate"=>"5", "min_tenure_months"=>"3", "institute_name"=>"ABC Bank", "risk"=>"3"}
-    "Investment_4"=>{"rate"=>"10", "min_tenure_months"=>"1", "institute_name"=>"ABC Bank", "risk"=>"5"}
-    "Investment_5"=>{"rate"=>"10", "min_tenure_months"=>"12", "institute_name"=>"ABC Bank", "risk"=>"3"}
+  INVESTMENT_OPTIONS = {"Investment_1"=>{"rate"=>"5", "min_tenure_months"=>"12", "institute_name"=>"ABC Bank", "risk"=>"1"}, "Investment_2"=>{"rate"=>"10", "min_tenure_months"=>"6", "institute_name"=>"ABC Bank", "risk"=>"2"}, "Investment_3"=>{"rate"=>"5", "min_tenure_months"=>"3", "institute_name"=>"ABC Bank", "risk"=>"3"}, "Investment_4"=>{"rate"=>"10", "min_tenure_months"=>"1", "institute_name"=>"ABC Bank", "risk"=>"5"},"Investment_5"=>{"rate"=>"10", "min_tenure_months"=>"12", "institute_name"=>"ABC Bank", "risk"=>"3"}
    }
 
    DEBIT_AREAS = ["F&B", "Utilities", "Petrol", "Movies", "Transfers", "Stocks"]
 
-  def get_account_ids(phone_no)
+  def self.get_account_ids(phone_no)
     cust_info = get_customer_info(phone_no)
     account_nos_hash = {}
     if !cust_info.blank?
@@ -25,7 +20,7 @@ class AnalyzeAccount
     return account_nos_hash
   end
 
-  def get_transaction_summary_for_customer(phone_no)
+  def self.get_transaction_summary_for_customer(phone_no)
     transaction_summary = {}
     account_nos_hash = get_account_ids(phone_no)
     account_ids = account_nos_hash.keys
@@ -59,7 +54,7 @@ class AnalyzeAccount
     return transaction_summary
   end
 
-  def get_max_spends(phone_no)
+  def self.get_max_spends(phone_no)
     top_trans = {}
     all_trans = {}
     account_nos_hash = get_account_ids(phone_no)
@@ -81,13 +76,13 @@ class AnalyzeAccount
     return top_trans
   end
 
-  def get_customer_info(phone_no)
+  def self.get_customer_info(phone_no)
     response = Barclay::V1.customers
     customers = response.parsed_response
     customer_info = customers.select {|customer| customer["mobileNo"] == phone_no}.last rescue nil
   end
 
-  def get_all_transactions(account_ids)
+  def self.get_all_transactions(account_ids)
     transaction_info = {}
     account_ids.each do |account_id|
       api_resp = Barclay::V1.transactions(account_id)
@@ -97,7 +92,7 @@ class AnalyzeAccount
     return transaction_info
   end
 
-  def get_account_balances(phone_no)
+  def self.get_account_balances(phone_no)
     cust_info = get_customer_info(phone_no)
     balance_hash = {}
     if !cust_info.blank?
@@ -113,7 +108,7 @@ class AnalyzeAccount
     return balance_hash
   end
 
-  def get_account_types(phone_no)
+  def self.get_account_types(phone_no)
     cust_info = get_customer_info(phone_no)
     actype_hash = {}
     if !cust_info.blank?
