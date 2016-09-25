@@ -1,7 +1,7 @@
 class Payments
 
   def self.get_payees(account_id)
-    cust_info = AnalyzeAccount::get_customer_info(phone_no)
+    # cust_info = AnalyzeAccount::get_customer_info(phone_no)
     payees = Barclay::V1.payees(account_id) rescue []
     return payees
   end
