@@ -1,13 +1,24 @@
 class Loans
+  LENDERS = [
+    {"institute_name"=>"CapitalOne", 'rate' => 18, 'tenure': 180},
+    {"institute_name"=>"LendingKart", 'rate' => 12, 'tenure': 90},
+    {"institute_name"=>"HDFC", 'rate' => 24, 'tenure': 180},
+    {"institute_name"=>"Bajaj Finance", 'rate' => 19, 'tenure': 180},
+    {"institute_name"=>"ICICI", 'rate' => 14, 'tenure': 90},
+  ]
 
-  def self.get_payees(account_id)
-    cust_info = AnalyzeAccount::get_customer_info(phone_no)
-    payees = Barclay::V1.payees(account_id).parsed_response rescue []
-    return payees
+  def self.apply_loans(amount, account_info)
+    offers = []
+    LOANS::LENDERS.each do |lender|
+      offer = lender
+      offer['tenure'] = offer['tenure']/30
+      offer['interest'] = (amount*(offer['tenure']/12)*offer['rate'])/100
+      offer['repayment'] = offer['interest'] + amount
+      offer['emi'] = offer['repayment']/offer['tenure']
+    end
   end
 
-  def self.transact(phone_no, payee_id, otp)
-    Sms::send_otp(otp, phone_no)
-    return {"id"=>"8573315966758950", "amount"=>{"moneyIn"=>"0.00", "moneyOut"=>"28.00"}, "accountBalanceAfterTransaction"=>{"position"=>"CR", "amount"=>"1500.00"}, "created"=>"06-09-2015 08:00:00 UTC", "description"=>"Texaco petrol station", "paymentDescriptor"=>{"id"=>"9701229312305196", "address"=>{"addressId"=>1, "number"=>"5", "buildingName"=>"Altrincham Retail Park", "street"=>"George Richards Way", "town"=>"Altrincham", "postalCode"=>"WA14 5GR", "country"=>"UK"}, "groupId"=>"4722", "logo"=>"", "name"=>"Texaco"}, "payee"=>nil, "pingIt"=>nil, "metadata"=>[{"key"=>nil, "value"=>nil}, {"key"=>"MERCHANT", "value"=>2731846737272357}], "notes"=>nil, "customerId"=>"8384692676375758", "paymentMethod"=>"CARD"}
+  def self.submit_application
+    return {'message' => 'We have submitted your application succesfully. The lender will get back to in next 24 hours.'}
   end
 end
