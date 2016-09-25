@@ -77,6 +77,8 @@ class Bot
       end
       return result
     when "/account_types"
+    when "accounts"
+    when "/accounts"
     when "account_types"
       result = ""
       hash = AnalyzeAccount.get_account_types("")
@@ -97,6 +99,24 @@ class Bot
       result = ""
       AnalyzeAccount::INVESTMENT_OPTIONS.each do |k,v|
         result = "#{result}#{k}:  #{v["institute_name"]} Offering #{v["rate"]}, Tenure: #{v["min_tenure_months"]} month, Risk factor: #{v["risk"]}\n"
+      end
+      return result
+    when "/inv_projection"
+    when "inv_projection"
+      result = ""
+      if value.count == 0 || value.count == 1
+        return "Please give command in form /inv_projection AMOUNT TENURE"
+      end
+      hash = AnalyzeAccount.get_investment_suggestions("", value[0], value[1])
+      hash.each do |k,v|
+        result = "#{result}#{k}:\n"
+        v.each do |k1,v1|
+          result = "#{result}  Option #{k1}\n"
+          result = "#{result}    Tenure  : #{v1[0]}"
+          result = "#{result}    Rate    : #{v1[1]}"
+          result = "#{result}    Proj Amt: #{v1[2]}"
+          result = "#{result}    Rise    : #{v1[3]}"
+        end
       end
       return result
     when "/loans"
@@ -187,7 +207,7 @@ class Bot
   end
 
   MORE_COMMANDS = {"/phone" => "My phone number"}
-  COMMANDS = {"/accounts" => "Details of all your Accouts","/transactions" => "Get details of all your transactions", "/expenditure" => "Get details of ", "/balance" => "Get balance of your accouts","/account_types" => "Get account types", "/more" => "Get more options", "/pay" => "Get your payments done via this command. For Example:\n pay payee_id amount", "/inv_opts" => "Show me Investment options", "/loans" => "Get loan providers info"}
+  COMMANDS = {"/accounts" => "Details of all your Accouts","/transactions" => "Get details of all your transactions", "/expenditure" => "Get details of ", "/balance" => "Get balance of your accouts","/account_types" => "Get account types", "/more" => "Get more options", "/pay" => "Get your payments done via this command. For Example:\n pay payee_id amount", "/inv_opts" => "Show me Investment options", "/loans" => "Get loan providers info", "/inv_projection" => "Get Investments projection for given amount. For Example: \ninv_projection AMOUNT TENURE\nWill give you amount of money you make by making this investment for given tenure. Take risk factor also into account :)"}
   # get_transaction_summary_for_customer(phone_no)
   # get_max_spends(phone_no)
   # get_account_balances(phone_no)
