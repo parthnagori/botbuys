@@ -141,12 +141,12 @@ class AnalyzeAccount
     matching_tenure_investments = {}
     diff_bal_hash = {}
     balances.each do |ac,bal|
-      diff_bal_hash[ac] = [bal,bal-amount]
+      diff_bal_hash[ac] = [bal.to_f,bal.to_f-amount.to_f]
     end
     final_amounts = {}
     investment_options = AnalyzeAccount::INVESTMENT_OPTIONS
     investment_options.each do |k,i_data|
-      if i_data["min_tenure_months"].to_i <= tenure
+      if i_data["min_tenure_months"].to_i <= tenure.to_i
         matching_tenure_investments[k] = i_data
       end
     end
