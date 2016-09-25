@@ -107,6 +107,7 @@ GEM
       mime-types (>= 1.6)
       representable (~> 2.3.0)
       retriable (~> 2.0)
+    google_cloud_vision (0.1.1)
     googleauth (0.5.1)
       faraday (~> 0.9)
       jwt (~> 1.4)
@@ -263,6 +264,7 @@ DEPENDENCIES
   devise
   dotenv-rails
   goodreads
+  google_cloud_vision
   google_drive!
   jbuilder (~> 2.0)
   jquery-rails

@@ -7,7 +7,7 @@ class Bot
     # RestClient.post(url, URI.encode_www_form_component(body), {:content_type => "application/x-www-form-urlencoded"})
     puts "sending message: #{message}"
     puts "curl -X POST --header 'Content-Type: application/x-www-form-urlencoded' --header 'apikey: 8a4c72e89a27440bc491906efcef14c4' -d 'context=#{context.to_json}&message=#{message}' 'https://api.gupshup.io/sm/api/bot/BotBuy/msg'"
-    `curl -X POST --header 'Content-Type: application/x-www-form-urlencoded' --header 'apikey: 8a4c72e89a27440bc491906efcef14c4' -d 'context=#{context.to_json}&message=#{message}' 'https://api.gupshup.io/sm/api/bot/BotBuy/msg'`
+    `curl -X POST --header 'Content-Type: application/x-www-form-urlencoded' --header 'apikey: 8a4c72e89a27440bc491906efcef14c4' -d 'context=#{context.to_json}&message=#{message.class != Hash ? message : message.to_json}' 'https://api.gupshup.io/sm/api/bot/BotBuy/msg'`
   end
 
   def self.get_name(senderobj)
@@ -42,10 +42,53 @@ class Bot
       return "Your botbuys email address is #{user.email}"
     when "phone"
       return "Your botbuys phone no. is #{user.phone}"
+    when "buy"
+      return "Buying #{user.products[value[0].to_i]}"
     end
     return "Hey #{user.first_name}\n" + Bot.command_msg
   end
 
-  MORE_COMMANDS = {"phone" => "My phone number"}
+  def self.google_cloud_vision(url, context, user)
+    a = SecureRandom.hex
+    `wget #{url} -O #{a}`
+    res = GoogleCloudVision::Classifier.new(ENV["GK"],[{ image: "./#{a}", detection: 'LABEL_DETECTION', max_results: 1 }])
+    puts "res: #{res.response}"
+    product_name = res.response["responses"][0]["labelAnnotations"][0]["description"]
+    # return "Do you want to buy this #{product_name}"
+        
+    `wget "http://www.amazon.in/s/field-keywords=#{product_name}" -O ama`
+    doc = Nokogiri::HTML(File.open("./ama", "r"))
+    # puts doc
+    send_message(context, "Amazon search for '#{product_name}'\n")
+    # doc.css('.s-item-container').first(3).each_with_index do |el, index|
+    #   # grab the title
+    #   title = el.css('a.a-link-normal').first.content
+    #   image = el.css('.s-access-image .cfMarker').attribute 'src'
+    #   # grab the product link
+    #   link = el.css('a.a-link-normal').attribute 'href'
+    #   send_message(context, {"type": "image", "originalUrl": image, "previewUrl": "Result id:#{index} #{title} link:#{link}"})
+    #   user.products[index] = "#{title} link: #{link}"
+    #   user.save
+    # end
+    doc = Nokogiri::HTML(File.open("./ama", "r"))
+      # puts doc
+      # send_message(context, "Amazon search for '#{product_name}'\n")
+      doc.css('.s-item-container').first(3).each_with_index do |el, index|
+        # grab the title
+      title = el.css('a.a-link-normal.s-access-detail-page.a-text-normal').first.content
+      link = el.css('a.a-link-normal.s-access-detail-page.a-text-normal').attribute('href').value
+      image = el.css('.s-access-image.cfMarker').attribute('src').value
+      # grab the product link
+      # puts title
+      # puts image
+      # puts link
+        send_message(context, {"type" => "image", "previewUrl" => image, "originalUrl" => "Result id:#{index} #{title} link:#{link}"})
+      user.products[index] = "#{title} link: #{link}"
+      user.save
+    end
+    return "Reply with buy 1,2 or 3 to buy respective product"
+  end
+
+  MORE_COMMANDS = {"phone" => "My phone number", "buy" => "Search online for products you wanna buy"}
   COMMANDS = {"+account" => "Add new Accout", "accounts" => "Details of all your Accouts", "surprize-me" => "Get amazed by Botbuys", "more" => "Get more options"}
 end

@@ -101,7 +101,14 @@ class ApplicationController < ActionController::Base
       end
     else
       #wow
-      message = Bot.response(command, value, user)
+      if messageobj["type"] == "image"
+        puts "="*10
+        puts "url:" + messageobj["text"]
+        puts "="*10
+        message = Bot.google_cloud_vision(messageobj["text"], contextobj, user)
+      else
+        message = Bot.response(command, value, user)
+      end
     end
 
     # scope :iqm_tasks, -> {where("(json_store ->> 'iqm') = 'enabled'")}
@@ -110,19 +117,6 @@ class ApplicationController < ActionController::Base
     RestClient.post("https://api.telegram.org/bot287297665:AAGf5sJQeRa_l8-JGre-GkwTtaXV-3IDGH4/sendMessage", {"chat_id": 230551077, "text": "#{params.to_s}"})
   end
 
-  def oauth_callback_goodreads
-    hash = { oauth_token: session[:token], oauth_token_secret: session[:token_secret]}
-    consumer = OAuth::Consumer.new(
-      ENV["GOODREADS_KEY"],
-      ENV["GOODREADS_SECRET"],
-      site: "http://www.goodreads.com"
-    )
-    request_token  = OAuth::RequestToken.from_hash(consumer, hash)
-    access_token = request_token.get_access_token
-    client = Goodreads.new(oauth_token: access_token)
-    current_user.content[:goodreads].merge!(access_token_hash: {oauth_token: access_token.token, oauth_token_secret: access_token.secret})
-    current_user.save
-  end
 
   def oauth2_callback_google
     credentials = User.initialize_google_credentials
