@@ -15,7 +15,11 @@ class AnalyzeAccount
     if !cust_info.blank?
       accounts_list = cust_info["accountList"]
       accounts_list.each do |account|
-        account_nos_hash[account["id"]] = account["accountNo"]
+        if account["accountNo"].blank?
+          account_nos_hash[account["id"]] = account["accountType"]+account["card"]["cardNumber"]
+        else  
+          account_nos_hash[account["id"]] = account["accountType"]+account["accountNo"]
+        end
       end
     end
     return account_nos_hash
@@ -93,18 +97,36 @@ class AnalyzeAccount
     return transaction_info
   end
 
-  
-
   def get_account_balances(phone_no)
     cust_info = get_customer_info(phone_no)
     balance_hash = {}
     if !cust_info.blank?
       accounts_list = cust_info["accountList"]
       accounts_list.each do |account|
-        balance_hash[account["accountNo"]] = account["cuurentBalance"]
+        if account["accountNo"].blank?
+          balance_hash[account["accountType"]+account["card"]["cardNumber"]] = account["currentBalance"]
+        else  
+          balance_hash[account["accountType"]+account["accountNo"]] = account["currentBalance"]
+        end
       end
     end
     return balance_hash
+  end
+
+  def get_account_types(phone_no)
+    cust_info = get_customer_info(phone_no)
+    actype_hash = {}
+    if !cust_info.blank?
+      accounts_list = cust_info["accountList"]
+      accounts_list.each do |account|
+        if account["accountNo"].blank?
+          actype_hash[account["card"]["cardNumber"]] = account["accountType"]
+        else
+          actype_hash[account["accountNo"]] = account["accountType"]
+        end
+      end
+    end
+    return actype_hash
   end
 
 end
