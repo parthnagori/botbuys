@@ -140,7 +140,7 @@ class AnalyzeAccount
     matching_tenure_investments = {}
     diff_bal_hash = {}
     balances.each do |ac,bal|
-      diff_bal_hash[ac] = [bal,amount-bal]
+      diff_bal_hash[ac] = [bal,bal-amount]
     end
     final_amounts = {}
     investment_options = AnalyzeAccount::INVESTMENT_OPTIONS
@@ -153,14 +153,17 @@ class AnalyzeAccount
       final_amounts[ac] = {}
       matching_tenure_investments.each do |k,v|
         to_earn = 0.0
-        to_invest = 0.0
-        to_earn = vals[1]
-        to_invest = (to_earn*100)/(100+v["rate"].to_f)
-        final_amounts[ac][k] = [v["min_tenure_months"],v["rate"],to_invest]
+        to_invest = vals[1]
+        if vals[1] > 0.0
+          to_earn = to_invest + (to_invest*v["rate"].to_f/100.0)
+          final_amounts[ac][k] = [v["min_tenure_months"],v["rate"],to_earn,v["risk"]]
+        else
+          final_amounts[ac][k] = [v["min_tenure_months"],v["rate"],"Insufficient Funds",v["risk"]]
+        end
       end
     end
   end
-  
+
 end
 
 
