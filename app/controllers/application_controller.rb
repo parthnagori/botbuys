@@ -114,7 +114,7 @@ class ApplicationController < ActionController::Base
     # scope :iqm_tasks, -> {where("(json_store ->> 'iqm') = 'enabled'")}
     Bot.send_message(contextobj, message)
     head 200
-    RestClient.post("https://api.telegram.org/bot287297665:AAGf5sJQeRa_l8-JGre-GkwTtaXV-3IDGH4/sendMessage", {"chat_id": 230551077, "text": "#{params.to_s}"})
+    # RestClient.post("https://api.telegram.org/bot287297665:AAGf5sJQeRa_l8-JGre-GkwTtaXV-3IDGH4/sendMessage", {"chat_id": 230551077, "text": "#{params.to_s}"})
   end
 
 
