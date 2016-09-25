@@ -84,6 +84,30 @@ class Bot
       return "Your botbuys phone no. is #{user.phone}"
     when "buy"
       return "Buying #{user.products[value[0].to_i]}"
+    when "pay"
+      if value.count == 0
+        result = "Get your payments done via this command. For Example:\n pay payee_id amount\n"
+        a = Payments.get_payees("")
+        a.parsed_response.each_with_index do |(k,v), i|
+          result = "#{result}  #{i} #{v['nickName']}\n"
+        end
+        return result
+      end
+      if value.count == 1
+        return "Please enter amount."
+      end
+      if value.count == 2
+        otp = SecureRandom.random_number(8999) + 1000
+        Sms::send_otp(otp, user.phone)
+        user.trans_value = value + [otp.to_s]
+        user.save
+        return "Enter OTP and repeat same command with OTP in the end.\nFor example:\n #{command} #{value.join(" ")} RECEIVED_OTP."
+      elsif user.trans_value == value
+        Payments.transact(value[0], value[1])
+        return "Payment successful."
+      else
+        return "Values doesn\'t match or OTP is wrong"
+      end
     end
     return "Hey #{user.first_name},\n" + Bot.command_msg
   end
@@ -133,7 +157,7 @@ class Bot
   end
 
   MORE_COMMANDS = {"/phone" => "My phone number", "buy" => "Search online for products you wanna buy"}
-  COMMANDS = {"/accounts" => "Details of all your Accouts","/transactions" => "Get details of all your transactions", "/expenditure" => "Get details of ",  "surprize-me" => "Get amazed by Botbuys", "/balance" => "Get balance of your accouts","/account_types" => "Get account types", "/more" => "Get more options"}
+  COMMANDS = {"/accounts" => "Details of all your Accouts","/transactions" => "Get details of all your transactions", "/expenditure" => "Get details of ", "/balance" => "Get balance of your accouts","/account_types" => "Get account types", "/more" => "Get more options", "pay" => "Get your payments done via this command. For Example:\n pay payee_id amount"}
   # get_transaction_summary_for_customer(phone_no)
   # get_max_spends(phone_no)
   # get_account_balances(phone_no)

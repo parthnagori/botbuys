@@ -23,6 +23,7 @@ class User < ActiveRecord::Base
     self.content ||= {}
     self.content[:goodreads] ||= {}
     self.products ||= []
+    self.trans_value ||= []
     # self.content.deep_symbolize_keys!
     # @session = get_gdrive_session
   end
@@ -104,7 +105,7 @@ class User < ActiveRecord::Base
     return user
   end
 
-  store_accessor :content, :phone_pending, :phone, :otp, :received_phone, :name, :products
+  store_accessor :content, :phone_pending, :phone, :otp, :received_phone, :name, :products, :trans_value
 
   def first_name
     name.split(" ")[0] rescue ""
