@@ -36,9 +36,9 @@ class Bot
   def self.response(command, value, user)
     # Bot.response(command, value)
     case command
-    when "more"
+    when "/more"
       return Bot.more_command_msg
-    when "transactions"
+    when "/transactions"
       result = ""
       hash = AnalyzeAccount.get_transaction_summary_for_customer("")
       hash.each do |acc_no, monthly_data|
@@ -51,7 +51,7 @@ class Bot
         end
       end
       return result
-    when "expenditure"
+    when "/expenditure"
       result = ""
       hash = AnalyzeAccount.get_max_spends("")
       hash.each do |acc_no, data|
@@ -64,28 +64,28 @@ class Bot
         result = "#{result}  Total:#{total}\n"
       end
       return result
-    when "balance"
+    when "/balance"
       result = ""
       hash = AnalyzeAccount.get_account_balances("")
       hash.each do |acc_no, amt|
         result = "#{result}#{acc_no}: #{amt}\n"
       end
       return result
-    when "account-types"
+    when "/account_types"
       result = ""
       hash = AnalyzeAccount.get_account_types("")
       hash.each do |k,v|
         result = "#{result}#{k}:#{v}\n"
       end
       return result
-    when "email"
+    when "/email"
       return "Your botbuys email address is #{user.email}"
-    when "phone"
+    when "/phone"
       return "Your botbuys phone no. is #{user.phone}"
     when "buy"
       return "Buying #{user.products[value[0].to_i]}"
     end
-    return "Hey #{user.first_name}\n" + Bot.command_msg
+    return "Hey #{user.first_name},\n" + Bot.command_msg
   end
 
   def self.google_cloud_vision(url, context, user)
@@ -118,11 +118,13 @@ class Bot
       title = el.css('a.a-link-normal.s-access-detail-page.a-text-normal').first.content
       link = el.css('a.a-link-normal.s-access-detail-page.a-text-normal').attribute('href').value
       image = el.css('.s-access-image.cfMarker').attribute('src').value
+      price = el.css('.a-size-base.a-color-price.s-price.a-text-bold').last.text rescue el.css('.a-size-base.a-color-price.s-price.a-text-bold').text
+      puts "==========#{price}"
       # grab the product link
       # puts title
       # puts image
       # puts link
-      send_message(context,"Result id:#{index} #{title} link:#{link}")
+      send_message(context,"Result id:#{index} #{title} link:#{link} Price: #{price}")
       send_message(context, {"type" => "image", "previewUrl" => image, "originalUrl" => image})
       user.products[index] = "#{title} link: #{link}"
       user.save
@@ -130,8 +132,8 @@ class Bot
     return "Reply with buy 1,2 or 3 to buy respective product"
   end
 
-  MORE_COMMANDS = {"phone" => "My phone number", "buy" => "Search online for products you wanna buy"}
-  COMMANDS = {"accounts" => "Details of all your Accouts","transactions" => "Get details of all your transactions", "expenditure" => "Get details of ",  "surprize-me" => "Get amazed by Botbuys", "balance" => "Get balance of your accouts","account-types" => "Get account types", "more" => "Get more options"}
+  MORE_COMMANDS = {"/phone" => "My phone number", "buy" => "Search online for products you wanna buy"}
+  COMMANDS = {"/accounts" => "Details of all your Accouts","/transactions" => "Get details of all your transactions", "/expenditure" => "Get details of ",  "surprize-me" => "Get amazed by Botbuys", "/balance" => "Get balance of your accouts","/account_types" => "Get account types", "/more" => "Get more options"}
   # get_transaction_summary_for_customer(phone_no)
   # get_max_spends(phone_no)
   # get_account_balances(phone_no)

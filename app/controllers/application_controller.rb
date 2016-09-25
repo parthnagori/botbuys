@@ -89,7 +89,7 @@ class ApplicationController < ActionController::Base
     if !user.content["verified"]
       if !user.phone 
         if !user.received_phone
-          message = "Hey #{Bot.get_name(senderobj)} can we have your phone number?"
+          message = "Hey #{Bot.get_name(senderobj)}, Please provide your phone number?"
           user.received_phone = true
           user.save
         else
