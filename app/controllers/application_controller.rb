@@ -33,33 +33,90 @@ class ApplicationController < ActionController::Base
     redirect_to credentials.authorization_uri.to_s
   end
 
+  def otp_mode(user,received_message)
+    if !user.otp
+      if !received_message.scan(/\d{10}/).blank?
+        message = "Enter OTP"
+        user.phone = received_message
+        otp = SecureRandom.random_number(8999) + 1000
+        user.otp = otp
+        Sms.send_otp(otp, user.phone)
+        puts "user otp: #{otp}"
+        user.save
+      else
+        message = "Please enter valid phone number"
+      end
+    else
+      if user.otp.to_s == received_message.to_s
+        message = "Verified!\n"
+        message = message + Bot.command_msg
+        if euser = User.verified.find_by(email: user.email)
+          user.parent_id = euser.id
+          user.save
+        end
+        user.content["verified"] = true
+        user.save
+      else
+        message = "Wrong otp"
+        puts "wrong OTP"
+        user.otp = nil
+        user.save
+      end
+    end
+    return message
+  end
+
   def incoming_bot
     params.permit!
     contextobj = JSON.parse(params["contextobj"])
     senderobj = JSON.parse(params["senderobj"])
     messageobj = JSON.parse(params["messageobj"])
-    puts "="*100
-    puts messageobj
-    puts messageobj["text"]
-    puts "="*100
-    Bot.send_message(contextobj, messageobj["text"] + " Yay!")
+    # puts "="*100
+    # puts messageobj
+    # puts messageobj["text"]
+    # puts "="*100
+    channel_name = senderobj["channeltype"]
+    channel_id = senderobj["channelid"]
+    user = User.get_user(channel_name, channel_id).last
+    received_message = messageobj["text"]
+    if user.blank?
+      user = User.create_from_channel(channel_name, channel_id)
+      user.name = Bot.get_name(senderobj)
+      user.save
+    end
+    command = received_message.split(" ")[0]
+    value = received_message.split(" ")[1..-1]
+    if !user.content["verified"]
+      if !user.phone 
+        if !user.received_phone
+          message = "Hey #{Bot.get_name(senderobj)} can we have your phone number?"
+          user.received_phone = true
+          user.save
+        else
+          message = otp_mode(user,received_message)
+        end
+      else
+        message = otp_mode(user,received_message)
+        # phone_number = received_messagereceive_phone
+      end
+    else
+      #wow
+      if messageobj["type"] == "image"
+        puts "="*10
+        puts "url:" + messageobj["text"]
+        puts "="*10
+        message = Bot.google_cloud_vision(messageobj["text"], contextobj, user)
+      else
+        message = Bot.response(command, value, user)
+      end
+    end
+
+    # scope :iqm_tasks, -> {where("(json_store ->> 'iqm') = 'enabled'")}
+    Bot.send_message(contextobj, message)
     head 200
     RestClient.post("https://api.telegram.org/bot287297665:AAGf5sJQeRa_l8-JGre-GkwTtaXV-3IDGH4/sendMessage", {"chat_id": 230551077, "text": "#{params.to_s}"})
   end
 
-  def oauth_callback_goodreads
-    hash = { oauth_token: session[:token], oauth_token_secret: session[:token_secret]}
-    consumer = OAuth::Consumer.new(
-      ENV["GOODREADS_KEY"],
-      ENV["GOODREADS_SECRET"],
-      site: "http://www.goodreads.com"
-    )
-    request_token  = OAuth::RequestToken.from_hash(consumer, hash)
-    access_token = request_token.get_access_token
-    client = Goodreads.new(oauth_token: access_token)
-    current_user.content[:goodreads].merge!(access_token_hash: {oauth_token: access_token.token, oauth_token_secret: access_token.secret})
-    current_user.save
-  end
 
   def oauth2_callback_google
     credentials = User.initialize_google_credentials

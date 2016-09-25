@@ -8,12 +8,23 @@ class User < ActiveRecord::Base
          :recoverable, :rememberable, :trackable, :validatable
 
   after_initialize :init
+  scope :get_user, -> (channeltype, channelid) {where("(content ->> 'channelid') = '#{channelid}'").where("(content ->> 'channeltype') = '#{channeltype}'")}
+  scope :verified, ->{ where("(content ->> 'verified') = 'true'") }
+
+  def parent
+    if parent_id
+      return User.find parent_id
+    else
+      return self
+    end
+  end
 
   def init
     self.content ||= {}
     self.content[:goodreads] ||= {}
-    self.content.deep_symbolize_keys!
-    @session = get_gdrive_session
+    self.products ||= []
+    # self.content.deep_symbolize_keys!
+    # @session = get_gdrive_session
   end
 
   def upload_to_drive(local_path, file_name, remote_folder = nil, public = true)
@@ -83,6 +94,20 @@ class User < ActiveRecord::Base
       page = page + 1
     end while !books.blank?
     return result
+  end
+
+  def self.create_from_channel(ctype, cid)
+    user = User.create(email: "#{cid}@botbuys.com", password: SecureRandom.hex)
+    user.content["channeltype"] = ctype
+    user.content["channelid"] = cid
+    user.save
+    return user
+  end
+
+  store_accessor :content, :phone_pending, :phone, :otp, :received_phone, :name, :products
+
+  def first_name
+    name.split(" ")[0] rescue ""
   end
 
   def self.save_from_google_user(credentials)

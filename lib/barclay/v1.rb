@@ -91,10 +91,13 @@ module Barclay
       end
 
       private
-        def get(url, uri)
-          uri = URI.parse(url + uri)
-          # options.merge!(self.auth)
-          @response = Net::HTTP.get(uri)
+        def get(url, _uri)
+          uri = URI.parse(url + _uri)
+          @response =  $redis.get(_uri)
+          if @response.nil?
+            @response = Net::HTTP.get(uri)
+            $redis.set(_uri, @response)
+          end
           self
         end
 
