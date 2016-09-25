@@ -82,7 +82,8 @@ class Bot
       # puts title
       # puts image
       # puts link
-        send_message(context, {"type" => "image", "previewUrl" => image, "originalUrl" => "Result id:#{index} #{title} link:#{link}"})
+      send_message(context,"Result id:#{index} #{title} link:#{link}")
+      send_message(context, {"type" => "image", "previewUrl" => image, "originalUrl" => image})
       user.products[index] = "#{title} link: #{link}"
       user.save
     end
