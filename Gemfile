@@ -14,6 +14,7 @@ gem 'dotenv-rails', :groups => [:development, :test]
 gem 'delayed_job_active_record'
 gem 'twilio-ruby'
 gem 'google_cloud_vision'
+gem 'redis'
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
 gem 'google_drive', git: 'https://github.com/gimite/google-drive-ruby.git', branch: "master"
