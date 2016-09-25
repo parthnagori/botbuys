@@ -1,5 +1,5 @@
 class AnalyzeAccount
-  INVESTMENT_OPTIONS = {"Investment_1"=>{"rate"=>"5", "min_tenure_months"=>"12", "institute_name"=>"ABC Bank", "risk"=>"1"}, "Investment_2"=>{"rate"=>"10", "min_tenure_months"=>"6", "institute_name"=>"ABC Bank", "risk"=>"2"}, "Investment_3"=>{"rate"=>"5", "min_tenure_months"=>"3", "institute_name"=>"ABC Bank", "risk"=>"3"}, "Investment_4"=>{"rate"=>"10", "min_tenure_months"=>"1", "institute_name"=>"ABC Bank", "risk"=>"5"},"Investment_5"=>{"rate"=>"10", "min_tenure_months"=>"12", "institute_name"=>"ABC Bank", "risk"=>"3"}
+  INVESTMENT_OPTIONS = {"1"=>{"rate"=>"5", "min_tenure_months"=>"12", "institute_name"=>"ABC Bank", "risk"=>"1"}, "2"=>{"rate"=>"10", "min_tenure_months"=>"6", "institute_name"=>"ABC Bank", "risk"=>"2"}, "3"=>{"rate"=>"5", "min_tenure_months"=>"3", "institute_name"=>"ABC Bank", "risk"=>"3"}, "4"=>{"rate"=>"10", "min_tenure_months"=>"1", "institute_name"=>"ABC Bank", "risk"=>"5"},"5"=>{"rate"=>"10", "min_tenure_months"=>"12", "institute_name"=>"ABC Bank", "risk"=>"3"}
    }
 
    SAVINGS_INTEREST = 4.0
@@ -161,7 +161,6 @@ class AnalyzeAccount
       end
     end
   end
-  
 end
 
 

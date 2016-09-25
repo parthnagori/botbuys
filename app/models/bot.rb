@@ -84,7 +84,13 @@ class Bot
       return "Your botbuys phone no. is #{user.phone}"
     when "buy"
       return "Buying #{user.products[value[0].to_i]}"
-    when "pay"
+    when "/inv_opts"
+      result = ""
+      AnalyzeAccount::INVESTMENT_OPTIONS.each do |k,v|
+        result = "#{result}#{k}:  #{v["institute_name"]} Offering #{v["rate"]}, Tenure: #{v["min_tenure_months"]} month, Risk factor: #{v["risk"]}\n"
+      end
+      return result
+    when "/pay"
       if value.count == 0
         result = "Get your payments done via this command. For Example:\n pay payee_id amount\n"
         a = Payments.get_payees("")
@@ -157,7 +163,7 @@ class Bot
   end
 
   MORE_COMMANDS = {"/phone" => "My phone number", "buy" => "Search online for products you wanna buy"}
-  COMMANDS = {"/accounts" => "Details of all your Accouts","/transactions" => "Get details of all your transactions", "/expenditure" => "Get details of ", "/balance" => "Get balance of your accouts","/account_types" => "Get account types", "/more" => "Get more options", "pay" => "Get your payments done via this command. For Example:\n pay payee_id amount"}
+  COMMANDS = {"/accounts" => "Details of all your Accouts","/transactions" => "Get details of all your transactions", "/expenditure" => "Get details of ", "/balance" => "Get balance of your accouts","/account_types" => "Get account types", "/more" => "Get more options", "/pay" => "Get your payments done via this command. For Example:\n pay payee_id amount", "/inv_opts" => "Show me Investment options"}
   # get_transaction_summary_for_customer(phone_no)
   # get_max_spends(phone_no)
   # get_account_balances(phone_no)
