@@ -1,9 +1,9 @@
 module Sms
   class << self
     def send_otp(otp, phone)
-      twilio_sid = "AC1cf1b6dfdf5180b3f4c2eadde78860da"
-      twilio_token = "6010682900ee93a4ac5b462d5335915d"
-      twilio_phone_number = "3477089548"
+      twilio_sid = ENV["TWILIO_SID"]
+      twilio_token = ENV["TWILIO_TOKEN"]
+      twilio_phone_number = ENV["TWILIO_PHONE_NUMBER"]
 
       unless otp.blank? || phone.blank?
         @twilio_client = Twilio::REST::Client.new twilio_sid, twilio_token
@@ -17,3 +17,5 @@ module Sms
     end
   end
 end
+
+
